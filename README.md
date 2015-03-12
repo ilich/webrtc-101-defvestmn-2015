@@ -1,2 +1,2 @@
-# webrtc-101-defvestmn-2015
+# WebRTC Chat Application
 WebRTC Sample Application shown on DevFestMN 2015

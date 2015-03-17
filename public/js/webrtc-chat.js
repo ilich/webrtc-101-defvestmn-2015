@@ -1,9 +1,58 @@
 (function () {
 
+	// Setup WebRTC functions:
+	// 1. WebKit browsers require webkit prefix
+	// 2. Firefox requires moz prefix
+	
+	var RTCPeerConnection = window.RTCPeerConnection
+		|| window.webkitRTCPeerConnection
+		|| window.mozRTCPeerConnection;
+
+	var RTCSessionDescription = window.RTCSessionDescription
+		|| window.webkitRTCSessionDescription
+		|| window.mozRTCSessionDescription;
+
+	var RTCIceCandidate = window.RTCIceCandidate
+		|| window.webkitRTCIceCandidate
+		|| window.mozRTCIceCandidate;
+
+	var getUserMedia = null;
+	var connectToVideoStream = null;
+
+	if (navigator.getUserMedia) {
+		getUserMedia = navigator.getUserMedia.bind(navigator);
+
+		connectToVideoStream = function (stream, controlId) {
+			var control = document.getElementById(controlId);
+			control.srcObject = stream;
+			control.play();
+		};
+	} else if (navigator.webkitGetUserMedia) {
+		getUserMedia = navigator.webkitGetUserMedia.bind(navigator);
+
+		connectToVideoStream = function (stream, controlId) {
+			var control = document.getElementById(controlId);
+			control.src = webkitURL.createObjectURL(stream);
+			control.play();
+		};
+	} else if (navigator.mozGetUserMedia) {
+		getUserMedia = navigator.mozGetUserMedia.bind(navigator);
+
+		connectToVideoStream = function (stream, controlId) {
+			var control = document.getElementById(controlId);
+			control.mozSrcObject = stream;
+			control.play();
+		};
+	}
+
+	// -------------------------
+
+	// Peer-to-peer chat
+
 	function Room(roomId) {
 		var me = this;
 		this.roomId = roomId;
-		
+
 		function generateRoomUrl(roomId) {
 			var url = location.protocol + '//' + location.host + '/' + roomId;
 			return url;
@@ -37,9 +86,14 @@
 	}
 
 	$(document).ready(function () {
+		if (!isWebRTCSupported()) {	
+			$('.has-webrtc').hide();
+			$('#webrtc-not-supported').show();
+			return;
+		}
 
 		$('#join-chat').click(function () {
 			joinChat();
-		})
+		});
 	});
 })();

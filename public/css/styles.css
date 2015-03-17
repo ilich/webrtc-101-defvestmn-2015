@@ -2,6 +2,10 @@ h1 {
 	text-align: center;
 }
 
+#webrtc-not-supported {
+	display: none;
+}
+
 #chat {
 	display: none;
 }

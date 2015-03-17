@@ -3,7 +3,8 @@ var serveStatic = require('serve-static');
 var mustacheExpress = require('mustache-express');
 
 var config = require(__dirname + '/config/config');
-var homeController = require(__dirname + '/controllers/home')
+var homeController = require(__dirname + '/controllers/home');
+var signalServer = require(__dirname + '/controllers/signal-server');
 
 var app = express();
 
@@ -26,3 +27,5 @@ var server = app.listen(config.app.port, function () {
 
 	console.log('Server running at http://%s:%d', host, port);
 });
+
+signalServer(server);

@@ -58,11 +58,26 @@
 			return url;
 		}
 
+		function setupVideo() {
+			getUserMedia({
+				video: true,
+				audio: true
+			}, function (localStream) {
+				connectToVideoStream(localStream, 'local-video');
+			}, handleError);
+		}
+
+		function handleError(error) {
+			console.log(error);
+		}
+
 		var url = generateRoomUrl(this.roomId);
 		$('#chat-url').text(url);
 		$('#chat-url').attr('href', url);
 		$('#login').hide();
 		$('#chat').show();
+
+		setupVideo();
 	}
 
 	Room.prototype.join = function () {

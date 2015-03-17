@@ -62,6 +62,7 @@
 		var me = this;
 		this.roomId = roomId;
 		this.signalServer = io();
+		this.chatChannel = null;
 		this.peerConnection = new RTCPeerConnection({
 			iceServers: config.stunServers.map(function (server) {
 				return {
@@ -123,7 +124,45 @@
 				}, handleError);
 			}
 
+			function setupTextChat() {
+				if (me.chatChannel === null) {
+					return;
+				}
+
+				var $sendMessage = $('#send-message');
+
+				function showMessage(text) {
+					var $content = $('<div />').text(text);
+
+					var chatWindow = document.getElementById('chat-window');
+					$(chatWindow).append($content);
+					chatWindow.scrollTop = chatWindow.scrollHeight;
+				}
+
+				me.chatChannel.onopen = function () {
+					$sendMessage.removeAttr('disabled');
+				};
+
+				me.chatChannel.onmessage = function (event) {
+					showMessage(event.data);
+				};
+
+				$sendMessage.click(function () {
+					if (me.chatChannel === null) {
+						return;
+					}
+
+					var text = $('#message').val();
+					me.chatChannel.send(text);
+					showMessage(text);
+					$('#message').val('');
+				});
+			}
+
 			function setupCaller() {
+				me.chatChannel = me.peerConnection.createDataChannel("chat");
+				setupTextChat();
+
 				me.signalServer.on('callee-arrived', function () {
 					me.peerConnection.createOffer(newDescriptionCreated, handleError);
 				});
@@ -141,6 +180,20 @@
 			}
 
 			function setupCallee() {
+				// Beginning of text chat
+
+				me.peerConnection.ondatachannel = function (event) {
+					me.chatChannel = event.channel;
+					setupTextChat();
+
+					// This is wrong becaue the channel hasn't been initialized yet.
+					// We have to wait till onopen event is raised.
+					// Code:
+					// me.chatChannel.send('ok');
+				};
+
+				// End of text chat
+
 				me.signalServer.on('new-ice-candidate', function (iceEvent) {
 					me.peerConnection.addIceCandidate(new RTCIceCandidate(iceEvent.candidate));
 				});

@@ -1,0 +1,21 @@
+{
+  "name": "webrtc-video-chat",
+  "version": "1.0.0",
+  "description": "WebRTC Video Chat (DevFestMN 2015)",
+  "main": "index.js",
+  "keywords": [
+    "webrtc",
+    "video",
+    "chat",
+    "devfestmn"
+  ],
+  "author": "Ilya Verbitskiy",
+  "license": "Apache License 2",
+  "dependencies": {
+    "express": "^4.12.0",
+    "mustache-express": "^1.2.1",
+    "serve-static": "^1.9.1",
+    "shortid": "^2.1.3",
+    "socket.io": "^1.3.4"
+  }
+}
